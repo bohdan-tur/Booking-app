@@ -1,0 +1,166 @@
+
+
+
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: booking_db
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=12345Feo
+      - POSTGRES_DB=booking_db
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d booking_db" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: booking_redis
+    restart: always
+    ports:
+      - 6379:6379
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+  alembic:
+    build: .
+    container_name: booking_alembic
+    command: alembic upgrade head
+    environment:
+      - URL=postgresql+asyncpg://postgres:12345Feo@booking_db:5432/booking_db
+      - ALGORITHM:HS256
+      - SECRET_KEY=dc2f0e844ece38a2f39fab80058e5d143bece3240fdbabf63bb12f3c68f0d2e3
+      - REFRESH_SECRET_KEY=4zEAH+b/8UlQkfiolm90tNVkwrG2lkeUv+G9QfNh+xY=
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  backend:
+    build: .
+    container_name: booking_api
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - /app
+    ports:
+      - 8000:8000
+    environment:
+      - URL=postgresql+asyncpg://postgres:12345Feo@booking_db:5432/booking_db
+      - REDIS_URL=redis://redis:6379/0
+      - ALGORITHM:HS256
+      - SECRET_KEY=dc2f0e844ece38a2f39fab80058e5d143bece3240fdbabf63bb12f3c68f0d2e3
+      - REFRESH_SECRET_KEY=4zEAH+b/8UlQkfiolm90tNVkwrG2lkeUv+G9QfNh+xY=
+      - SMTP_HOST=smtp.gmail.com
+      - SMTP_PORT=587
+      - SMTP_USER=your-email@gmail.com
+      - SMTP_PASSWORD=your-app-password
+      - EMAIL_FROM=noreply@booking.com
+    depends_on:
+      - alembic
+      - redis
+  db_test:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: test_db
+    ports:
+      - "5433:5432"
+
+  celery_worker:
+    build: .
+    container_name: booking_celery_worker
+    command: celery -A app.celery_app worker --loglevel=info
+    volumes:
+      - /app
+    environment:
+      - URL=postgresql+asyncpg://postgres:12345Feo@booking_db:5432/booking_db
+      - REDIS_URL=redis://redis:6379/0
+      - ALGORITHM:HS256
+      - SECRET_KEY=dc2f0e844ece38a2f39fab80058e5d143bece3240fdbabf63bb12f3c68f0d2e3
+      - REFRESH_SECRET_KEY=4zEAH+b/8UlQkfiolm90tNVkwrG2lkeUv+G9QfNh+xY=
+      - SMTP_HOST=smtp.gmail.com
+      - SMTP_PORT=587
+      - SMTP_USER=your-email@gmail.com
+      - SMTP_PASSWORD=your-app-password
+      - EMAIL_FROM=noreply@booking.com
+    depends_on:
+      - db
+      - redis
+
+  celery_beat:
+    build: .
+    container_name: booking_celery_beat
+    command: celery -A app.celery_app beat --loglevel=info
+    volumes:
+      - /app
+    environment:
+      - URL=postgresql+asyncpg://postgres:12345Feo@booking_db:5432/booking_db
+      - REDIS_URL=redis://redis:6379/0
+      - ALGORITHM:HS256
+      - SECRET_KEY=dc2f0e844ece38a2f39fab80058e5d143bece3240fdbabf63bb12f3c68f0d2e3
+      - REFRESH_SECRET_KEY=4zEAH+b/8UlQkfiolm90tNVkwrG2lkeUv+G9QfNh+xY=
+      - SMTP_HOST=smtp.gmail.com
+      - SMTP_PORT=587
+      - SMTP_USER=your-email@gmail.com
+      - SMTP_PASSWORD=your-app-password
+      - EMAIL_FROM=noreply@booking.com
+    depends_on:
+      - db
+      - redis
+
+  flower:
+    build: .
+    container_name: booking_flower
+    command: celery -A app.celery_app flower --port=5555
+    volumes:
+      - /app
+    ports:
+      - 5555:5555
+    environment:
+      - URL=postgresql+asyncpg://postgres:12345Feo@booking_db:5432/booking_db
+      - REDIS_URL=redis://redis:6379/0
+      - ALGORITHM:HS256
+      - SECRET_KEY=dc2f0e844ece38a2f39fab80058e5d143bece3240fdbabf63bb12f3c68f0d2e3
+      - REFRESH_SECRET_KEY=4zEAH+b/8UlQkfiolm90tNVkwrG2lkeUv+G9QfNh+xY=
+      - SMTP_HOST=smtp.gmail.com
+      - SMTP_PORT=587
+      - SMTP_USER=your-email@gmail.com
+      - SMTP_PASSWORD=your-app-password
+      - EMAIL_FROM=noreply@booking.com
+    depends_on:
+      - db
+      - redis
+
+  tests:
+    build:
+      context: .
+    container_name: test_bookings
+    depends_on:
+      - db_test
+    environment:
+      - TEST_DATABASE_URL=postgresql+asyncpg://postgres:password@db_test:5432/test_db
+      - URL=postgresql+asyncpg://postgres:password@db_test:5432/test_db
+
+    restart: "no"
+    command: pytest -v app/tests/
+
+volumes:
+  postgres_data:
+  redis_data:
+
+
+

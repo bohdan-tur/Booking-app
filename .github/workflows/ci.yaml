@@ -1,0 +1,28 @@
+name: Booking App CI
+
+
+on:
+  push:
+    branches: [main,master]
+  pull_request:
+    branches: [main,master]
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Code downloading"
+        uses: actions/checkout@v4
+      - name: "Set up Python code"
+        uses: actions/setup-python@v5
+        with:
+              python-version: "3.13"
+      - name: "Check code with Ruff"
+        run: |
+           pip install ruff
+           ruff check .
+
+
+      - name:  "Running tests with Docker compose"
+        run: |
+         docker-compose run --rm tests

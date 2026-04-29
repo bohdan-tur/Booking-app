@@ -1,0 +1,13 @@
+.env
+.venv
+venv/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+.idea/
+.pytest_cache/
+.coverage
+htmlcov/
+.DS_Store
+Thumbs.db
