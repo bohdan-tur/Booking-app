@@ -63,11 +63,6 @@ services:
       - ALGORITHM:HS256
       - SECRET_KEY=dc2f0e844ece38a2f39fab80058e5d143bece3240fdbabf63bb12f3c68f0d2e3
       - REFRESH_SECRET_KEY=4zEAH+b/8UlQkfiolm90tNVkwrG2lkeUv+G9QfNh+xY=
-      - SMTP_HOST=smtp.gmail.com
-      - SMTP_PORT=587
-      - SMTP_USER=your-email@gmail.com
-      - SMTP_PASSWORD=your-app-password
-      - EMAIL_FROM=noreply@booking.com
     depends_on:
       - alembic
       - redis
@@ -92,11 +87,6 @@ services:
       - ALGORITHM:HS256
       - SECRET_KEY=dc2f0e844ece38a2f39fab80058e5d143bece3240fdbabf63bb12f3c68f0d2e3
       - REFRESH_SECRET_KEY=4zEAH+b/8UlQkfiolm90tNVkwrG2lkeUv+G9QfNh+xY=
-      - SMTP_HOST=smtp.gmail.com
-      - SMTP_PORT=587
-      - SMTP_USER=your-email@gmail.com
-      - SMTP_PASSWORD=your-app-password
-      - EMAIL_FROM=noreply@booking.com
     depends_on:
       - db
       - redis
@@ -113,11 +103,6 @@ services:
       - ALGORITHM:HS256
       - SECRET_KEY=dc2f0e844ece38a2f39fab80058e5d143bece3240fdbabf63bb12f3c68f0d2e3
       - REFRESH_SECRET_KEY=4zEAH+b/8UlQkfiolm90tNVkwrG2lkeUv+G9QfNh+xY=
-      - SMTP_HOST=smtp.gmail.com
-      - SMTP_PORT=587
-      - SMTP_USER=your-email@gmail.com
-      - SMTP_PASSWORD=your-app-password
-      - EMAIL_FROM=noreply@booking.com
     depends_on:
       - db
       - redis
@@ -136,11 +121,6 @@ services:
       - ALGORITHM:HS256
       - SECRET_KEY=dc2f0e844ece38a2f39fab80058e5d143bece3240fdbabf63bb12f3c68f0d2e3
       - REFRESH_SECRET_KEY=4zEAH+b/8UlQkfiolm90tNVkwrG2lkeUv+G9QfNh+xY=
-      - SMTP_HOST=smtp.gmail.com
-      - SMTP_PORT=587
-      - SMTP_USER=your-email@gmail.com
-      - SMTP_PASSWORD=your-app-password
-      - EMAIL_FROM=noreply@booking.com
     depends_on:
       - db
       - redis
