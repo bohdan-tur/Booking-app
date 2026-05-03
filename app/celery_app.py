@@ -11,20 +11,21 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-# Визначаємо налаштування для тестів
+
 if os.getenv("TESTING") == "true":
-    # Для тестів використовуємо memory broker/backend
+
     celery_app = Celery(
         "booking_app",
         broker="memory://",
         backend="cache+memory://",
         include=['app.tasks']
     )
-    # Відключаємо всі фонові задачі для тестів
+
     celery_app.conf.update(
         task_always_eager=True,
         task_eager_propagates=True,
         task_ignore_result=False,
+        result_backend='cache+memory://',
     )
 else:
     celery_app = Celery(
