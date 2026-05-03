@@ -9,6 +9,9 @@ from app.models.user_model import Users
 from app.main import app
 from app.db.database import Base, get_db
 from app.core.security import create_access_token
+
+# Встановлюємо змінну середовища для тестів
+os.environ["TESTING"] = "true"
 TEST_DATABASE_URL = os.getenv(
     "TEST_DATABASE_URL",
     "postgresql+asyncpg://postgres:password@db_test:5432/test_db"

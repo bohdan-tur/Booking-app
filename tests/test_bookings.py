@@ -61,7 +61,7 @@ async def test_get_single_booking(authenticated_client: AsyncClient, db_session)
     ).returning(Bookings.id))).scalar()
     await db_session.commit()
 
-    response = await authenticated_client.get(f"/bookingssingle/{booking_id}/")
+    response = await authenticated_client.get(f"/bookings/single/{booking_id}/")
     assert response.status_code == 200
     assert response.json()["id"] == booking_id
 

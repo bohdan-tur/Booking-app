@@ -1,3 +1,4 @@
+import os
 from celery import Celery
 from app.core.config import settings
 from app.core.email import send_email
@@ -10,12 +11,28 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-celery_app = Celery(
-    "booking_app",
-    broker=settings.REDIS_URL,
-    backend=settings.REDIS_URL,
-    include=['app.tasks']
-)
+# Визначаємо налаштування для тестів
+if os.getenv("TESTING") == "true":
+    # Для тестів використовуємо memory broker/backend
+    celery_app = Celery(
+        "booking_app",
+        broker="memory://",
+        backend="cache+memory://",
+        include=['app.tasks']
+    )
+    # Відключаємо всі фонові задачі для тестів
+    celery_app.conf.update(
+        task_always_eager=True,
+        task_eager_propagates=True,
+        task_ignore_result=False,
+    )
+else:
+    celery_app = Celery(
+        "booking_app",
+        broker=settings.REDIS_URL,
+        backend=settings.REDIS_URL,
+        include=['app.tasks']
+    )
 
 celery_app.conf.update(
     task_serializer='json',

@@ -88,7 +88,7 @@ async def test_delete_user_by_admin(authenticated_client: AsyncClient, db_sessio
     await db_session.commit()
 
 
-    response = await authenticated_client.delete(f"/usersremove/{new_user_id}")
+    response = await authenticated_client.delete(f"/users/remove/{new_user_id}")
     assert response.status_code in [200, 204]
 
 
