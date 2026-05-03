@@ -2,9 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select, update, delete
-from sqlalchemy.ext.asyncio import AsyncSession
 from app.dependencies import DbSession
-from app.db.database import get_db
 from app.core.security import hash_password
 from app.dependencies import allow_admin_and_manager, allow_admin, get_current_user
 from app.models.role_model import Role

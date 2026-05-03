@@ -4,6 +4,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship, validates
 
 from app.db.database import Base
 from app.models.role_model import Role
+from app.models.booking_model import Bookings
 
 
 class Users(Base):

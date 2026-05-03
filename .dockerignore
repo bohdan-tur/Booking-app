@@ -45,7 +45,7 @@ local_db/
 *.sqlite3
 
 
-app/.env
+.env
 .dockerignore
 ../Dockerfile
 ../docker-compose.yaml

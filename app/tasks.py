@@ -1,4 +1,3 @@
-from celery import Celery
 from app.celery_app import celery_app
 from app.core.email import send_booking_confirmation_email, send_booking_cancellation_email, send_booking_reminder_email
 from app.db.database import AsyncSessionLocal
@@ -13,13 +12,9 @@ logger = logging.getLogger(__name__)
 
 @celery_app.task(bind=True, max_retries=3)
 def process_booking_creation(self, booking_id: int, user_id: int, room_id: int, start_time: datetime, end_time: datetime):
-    """
-    Обробка створення бронювання (включаючи email сповіщення)
-    """
     async def process_booking():
         async with AsyncSessionLocal() as session:
             try:
-                # Отримуємо дані бронювання з бази
                 stmt = select(Bookings, Users, Rooms).join(Users).join(Rooms).where(Bookings.id == booking_id)
                 result = await session.execute(stmt)
                 booking_data = result.first()
@@ -58,13 +53,9 @@ def process_booking_creation(self, booking_id: int, user_id: int, room_id: int, 
 
 @celery_app.task(bind=True, max_retries=3)
 def process_booking_cancellation(self, booking_id: int, user_id: int):
-    """
-    Обробка скасування бронювання (включаючи email сповіщення)
-    """
     async def process_cancellation():
         async with AsyncSessionLocal() as session:
             try:
-                # Отримуємо дані користувача
                 stmt = select(Users).where(Users.id == user_id)
                 result = await session.execute(stmt)
                 user = result.scalar_one_or_none()
@@ -73,7 +64,6 @@ def process_booking_cancellation(self, booking_id: int, user_id: int):
                     logger.error(f"Користувача {user_id} не знайдено")
                     return {"status": "error", "message": "Користувача не знайдено"}
                 
-                # Відправляємо email про скасування
                 email_sent = send_booking_cancellation_email(
                     user_email=user.email,
                     user_name=user.username,
@@ -98,15 +88,11 @@ def process_booking_cancellation(self, booking_id: int, user_id: int):
 
 @celery_app.task
 def update_expired_bookings():
-    """
-    Оновлення статусів прострочених бронювань (active -> expired)
-    """
     async def update_statuses():
         async with AsyncSessionLocal() as session:
             try:
                 current_time = datetime.utcnow()
                 
-                # Оновлюємо статуси прострочених бронювань
                 stmt = update(Bookings).where(
                     Bookings.end_time < current_time,
                     Bookings.status == "active"
@@ -131,13 +117,9 @@ def update_expired_bookings():
 
 @celery_app.task
 def send_daily_reminders():
-    """
-    Відправка щоденних нагадувань про бронювання на завтра
-    """
     async def send_reminders():
         async with AsyncSessionLocal() as session:
             try:
-                # Бронювання, які починаються завтра
                 tomorrow = datetime.utcnow() + timedelta(days=1)
                 start_of_tomorrow = tomorrow.replace(hour=0, minute=0, second=0, microsecond=0)
                 end_of_tomorrow = tomorrow.replace(hour=23, minute=59, second=59, microsecond=999999)
@@ -185,13 +167,9 @@ def send_daily_reminders():
 
 @celery_app.task
 def cleanup_old_bookings():
-    """
-    Очищення старих бронювань (старших 1 року зі статусом 'expired')
-    """
     async def cleanup():
         async with AsyncSessionLocal() as session:
             try:
-                # Видаляємо бронювання старші 1 року
                 one_year_ago = datetime.utcnow() - timedelta(days=365)
                 
                 stmt = delete(Bookings).where(
@@ -218,16 +196,12 @@ def cleanup_old_bookings():
 
 @celery_app.task
 def generate_daily_statistics():
-    """
-    Генерація щоденної статистики для адмінів
-    """
     async def generate_stats():
         async with AsyncSessionLocal() as session:
             try:
                 today = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
                 tomorrow = today + timedelta(days=1)
                 
-                # Статистика за сьогодні
                 stmt = select(Bookings).where(
                     Bookings.start_time >= today,
                     Bookings.start_time < tomorrow
@@ -235,12 +209,10 @@ def generate_daily_statistics():
                 result = await session.execute(stmt)
                 today_bookings = len(result.scalars().all())
                 
-                # Активні бронювання
                 stmt = select(Bookings).where(Bookings.status == "active")
                 result = await session.execute(stmt)
                 active_bookings = len(result.scalars().all())
                 
-                # Завершені бронювання за останні 7 днів
                 week_ago = datetime.utcnow() - timedelta(days=7)
                 stmt = select(Bookings).where(
                     Bookings.end_time >= week_ago,
@@ -249,7 +221,6 @@ def generate_daily_statistics():
                 result = await session.execute(stmt)
                 completed_bookings = len(result.scalars().all())
                 
-                # Відправляємо звіт адмінам
                 stmt = select(Users).where(Users.role == "admin")
                 result = await session.execute(stmt)
                 admins = result.scalars().all()

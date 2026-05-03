@@ -3,7 +3,6 @@ from typing import Annotated
 from app.dependencies import DbSession
 from fastapi import APIRouter,Depends, HTTPException, status
 from sqlalchemy import select, delete, update
-from sqlalchemy.ext.asyncio import AsyncSession
 
 
 from app.dependencies import get_current_user, allow_admin_and_manager
@@ -33,7 +32,6 @@ async def book_room(
         end_time=end_time
     )
     
-    # Запускаємо Celery задачу для відправки email підтвердження
     process_booking_creation.delay(
         booking_id=booking.id,
         user_id=user.id,
@@ -105,7 +103,6 @@ async def cancel_booking(
 
     await db.commit()
     
-    # Запускаємо Celery задачу для відправки email про скасування
     process_booking_cancellation.delay(
         booking_id=id,
         user_id=result.user_id

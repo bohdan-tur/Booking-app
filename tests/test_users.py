@@ -1,5 +1,9 @@
 from httpx import AsyncClient
 import pytest
+from sqlalchemy import insert
+from app.models.user_model import Users
+from app.core.security import create_access_token
+from datetime import timedelta
 
 
 
@@ -51,12 +55,6 @@ async def test_create_user(authenticated_client: AsyncClient):
     assert response.status_code == 201
 
 
-import pytest
-from httpx import AsyncClient
-from sqlalchemy import insert
-from app.models.user_model import Users
-from app.core.security import create_access_token
-from datetime import timedelta
 
 
 @pytest.mark.asyncio

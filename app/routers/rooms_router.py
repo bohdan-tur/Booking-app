@@ -4,7 +4,6 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, status, HTTPException, Path
 from sqlalchemy import select, update, delete, and_, not_
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.dependencies import DbSession
 from app.db.database import get_db
 from app.dependencies import allow_admin
 from app.models.booking_model import Bookings

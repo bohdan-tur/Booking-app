@@ -4,9 +4,7 @@ from app.dependencies import DbSession
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy import select, or_
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db.database import get_db
 from app.core.security import verify_refresh_token, create_refresh_token, create_access_token, verify_password
 from app.models.user_model import Users
 from app.schemas.token_schema import RefreshToken_Schema

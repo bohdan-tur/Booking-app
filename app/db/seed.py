@@ -8,8 +8,6 @@ from app.db.database import AsyncSessionLocal
 
 from app.models.role_model import Role
 from app.models.user_model import Users
-from app.models.booking_model import Bookings
-from app.models.room_model import Rooms
 
 # Контекст для хешування пароля (типу argon2)
 pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")

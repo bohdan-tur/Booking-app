@@ -1,8 +1,5 @@
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
-from typing import Annotated
-from fastapi import Depends, HTTPException
-from app.db.database import get_db
+from fastapi import HTTPException
 from datetime import datetime
 from app.models.booking_model import Bookings
 from app.dependencies import DbSession

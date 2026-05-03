@@ -101,9 +101,6 @@ async def test_update_booking(authenticated_client: AsyncClient, db_session):
     ).returning(Bookings.id))).scalar()
     await db_session.commit()
 
-    new_start = datetime.now() + timedelta(days=5)
-    new_end = datetime.now() + timedelta(days=7)
-
     update_data = {
         "start_time": (datetime.now() + timedelta(days=5)).replace(microsecond=0).isoformat(),
         "end_time": (datetime.now() + timedelta(days=7)).replace(microsecond=0).isoformat()

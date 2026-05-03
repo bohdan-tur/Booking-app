@@ -7,37 +7,21 @@ import logging
 logger = logging.getLogger(__name__)
 
 def send_email(to_email: str, subject: str, body: str, html_body: str = None) -> bool:
-    """
-    Відправка email через SMTP
-    
-    Args:
-        to_email: Email отримувача
-        subject: Тема листа
-        body: Текст листа
-        html_body: HTML версія листа (опційно)
-    
-    Returns:
-        bool: True якщо успішно відправлено
-    """
     try:
-        # Створення повідомлення
         message = MIMEMultipart("alternative")
         message["Subject"] = subject
         message["From"] = settings.EMAIL_FROM
         message["To"] = to_email
         
-        # Додавання текстової версії
         text_part = MIMEText(body, "plain", "utf-8")
         message.attach(text_part)
         
-        # Додавання HTML версії якщо є
         if html_body:
             html_part = MIMEText(html_body, "html", "utf-8")
             message.attach(html_part)
         
-        # Підключення до SMTP сервера
         with smtplib.SMTP(settings.SMTP_HOST, settings.SMTP_PORT) as server:
-            server.starttls()  # Шифрування з'єднання
+            server.starttls()
             server.login(settings.SMTP_USER, settings.SMTP_PASSWORD)
             server.sendmail(settings.EMAIL_FROM, to_email, message.as_string())
         
@@ -49,7 +33,6 @@ def send_email(to_email: str, subject: str, body: str, html_body: str = None) ->
         return False
 
 def send_booking_confirmation_email(user_email: str, user_name: str, booking_id: int, room_name: str, start_time, end_time) -> bool:
-    """Спеціалізована функція для відправки підтвердження бронювання"""
     subject = "✅ Підтвердження бронювання"
     
     body = f"""
@@ -107,10 +90,9 @@ def send_booking_confirmation_email(user_email: str, user_name: str, booking_id:
 </html>
 """
     
-    return send_email(to_email, subject, body, html_body)
+    return send_email(user_email, subject, body, html_body)
 
 def send_booking_cancellation_email(user_email: str, user_name: str, booking_id: int) -> bool:
-    """Спеціалізована функція для відправки повідомлення про скасування"""
     subject = "❌ Скасування бронювання"
     
     body = f"""
@@ -128,10 +110,9 @@ def send_booking_cancellation_email(user_email: str, user_name: str, booking_id:
 Команда Booking System
 """
     
-    return send_email(to_email, subject, body)
+    return send_email(user_email, subject, body)
 
 def send_booking_reminder_email(user_email: str, user_name: str, booking_id: int, room_name: str, start_time) -> bool:
-    """Спеціалізована функція для відправки нагадування"""
     subject = "⏰ Нагадування про майбутнє бронювання"
     
     body = f"""
@@ -149,4 +130,4 @@ def send_booking_reminder_email(user_email: str, user_name: str, booking_id: int
 Команда Booking System
 """
     
-    return send_email(to_email, subject, body)
+    return send_email(user_email, subject, body)

@@ -10,10 +10,6 @@ from app.db.database import Base
 
 # --- ТУТ МАЮТЬ БУТИ ТВОЇ МОДЕЛІ ---
 # Якщо якийсь файл називається інакше (наприклад, models.py), зміни імпорт
-from app.models.user_model import Users
-from app.models.role_model import Role
-from app.models.room_model import Rooms
-from app.models.booking_model import Bookings
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

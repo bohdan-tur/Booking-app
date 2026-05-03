@@ -1,5 +1,4 @@
 from fastapi import FastAPI,Request
-from app.db.database import Base, engine
 import logging
 from logging.config import dictConfig
 from app.core.logging_config import LOGGING_CONFIG
