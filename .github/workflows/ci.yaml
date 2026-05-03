@@ -25,4 +25,4 @@ jobs:
 
       - name:  "Running tests with Docker compose"
         run: |
-         docker-compose run --rm tests
+         docker compose run --rm tests
