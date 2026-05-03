@@ -12,6 +12,16 @@ from app.core.security import create_access_token
 
 # Встановлюємо змінну середовища для тестів
 os.environ["TESTING"] = "true"
+
+# Примусово налаштовуємо Celery для тестів без Redis
+from app.celery_app import celery_app
+
+celery_app.conf.update(
+    task_always_eager=True,
+    task_eager_propagates=True,
+    broker_url='memory://',
+    result_backend='cache+memory://'
+)
 TEST_DATABASE_URL = os.getenv(
     "TEST_DATABASE_URL",
     "postgresql+asyncpg://postgres:password@db_test:5432/test_db"
