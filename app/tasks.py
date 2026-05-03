@@ -1,3 +1,4 @@
+import asyncio
 from app.celery_app import celery_app
 from app.core.email import send_booking_confirmation_email, send_booking_cancellation_email, send_booking_reminder_email
 from app.db.database import AsyncSessionLocal
