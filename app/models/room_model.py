@@ -1,6 +1,10 @@
+from typing import TYPE_CHECKING
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.database import Base
+
+if TYPE_CHECKING:
+    from app.models.booking_model import Bookings
 
 
 class Rooms(Base):

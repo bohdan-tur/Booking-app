@@ -1,9 +1,13 @@
 import re
+from typing import TYPE_CHECKING
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship, validates
 
 from app.db.database import Base
 from app.models.role_model import Role
+
+if TYPE_CHECKING:
+    from app.models.booking_model import Bookings
 
 
 class Users(Base):
