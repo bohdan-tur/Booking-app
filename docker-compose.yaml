@@ -136,7 +136,7 @@ services:
       - URL=postgresql+asyncpg://postgres:password@db_test:5432/test_db
 
     restart: "no"
-    command: pytest -v app/tests/
+    command: pytest -v tests/
 
 volumes:
   postgres_data:
