@@ -48,8 +48,18 @@ def process_booking_creation(self, booking_id: int, user_id: int, room_id: int, 
                     raise self.retry(countdown=60 * (self.request.retries + 1))
                 return {"status": "error", "message": str(exc)}
     
-    import asyncio
-    return asyncio.run(process_booking())
+    try:
+        # Намагаємося отримати поточний цикл (спрацює в тестах)
+        loop = asyncio.get_running_loop()
+        if loop:
+            # Оскільки ми вже в циклі, створюємо завдання для фонового виконання
+            loop.create_task(process_booking())
+        else:
+            # Якщо циклу немає (реальний Celery worker), створюємо новий
+            asyncio.run(process_booking())
+    except RuntimeError:
+        # Якщо циклу немає (це реальний Celery worker), створюємо новий
+        asyncio.run(process_booking())
 
 @celery_app.task(bind=True, max_retries=3)
 def process_booking_cancellation(self, booking_id: int, user_id: int):
@@ -83,8 +93,18 @@ def process_booking_cancellation(self, booking_id: int, user_id: int):
                     raise self.retry(countdown=60 * (self.request.retries + 1))
                 return {"status": "error", "message": str(exc)}
     
-    import asyncio
-    return asyncio.run(process_cancellation())
+    try:
+        # Намагаємося отримати поточний цикл (спрацює в тестах)
+        loop = asyncio.get_running_loop()
+        if loop:
+            # Оскільки ми вже в циклі, створюємо завдання для фонового виконання
+            loop.create_task(process_cancellation())
+        else:
+            # Якщо циклу немає (реальний Celery worker), створюємо новий
+            asyncio.run(process_cancellation())
+    except RuntimeError:
+        # Якщо циклу немає (це реальний Celery worker), створюємо новий
+        asyncio.run(process_cancellation())
 
 @celery_app.task
 def update_expired_bookings():
