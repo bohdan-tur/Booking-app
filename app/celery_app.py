@@ -25,6 +25,7 @@ if os.getenv("TESTING") == "true":
         task_always_eager=True,
         task_eager_propagates=True,
         task_ignore_result=False,
+        broker_url='memory://',
         result_backend='cache+memory://',
     )
 else:
